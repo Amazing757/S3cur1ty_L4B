@@ -22,7 +22,7 @@ To find the lab, open PortSwigger Web Security Academy, go to \*\*All labs\*\*, 
 
 
 
-!\[Access control lab list](<images/01-Start01bp\_Access control vulnerabilities\_IDOR.png>)
+![Access control lab list](<images/01-Start01bp\_Access control vulnerabilities\_IDOR.png>)
 
 
 
@@ -30,7 +30,7 @@ Find the specific lab: \*\*Insecure direct object references (IDOR)\*\*.
 
 
 
-!\[IDOR lab list](<images/02-Start02bp\_Access control vulnerabilities\_IDOR.png>)
+![IDOR lab list](<images/02-Start02bp\_Access control vulnerabilities\_IDOR.png>)
 
 
 
@@ -46,7 +46,7 @@ The goal is to find the password for the user `carlos` and log in to his account
 
 
 
-!\[Lab description](<images/03-Access\_lab\_bp\_Access control vulnerabilities\_IDOR.png>)
+![Lab description](<images/03-Access\_lab\_bp\_Access control vulnerabilities\_IDOR.png>)
 
 
 
@@ -62,7 +62,7 @@ After entering the lab, open the \*\*Live chat\*\* page and send a message to th
 
 
 
-!\[Live chat page](<images/04-Live\_chat\_bp\_Access control vulnerabilities\_IDOR.png>)
+![Live chat page](<images/04-Live\_chat\_bp\_Access control vulnerabilities\_IDOR.png>)
 
 
 
@@ -78,7 +78,7 @@ In the HTTP history, the requests related to `/viewTranscript.js` and `/chat` ca
 
 
 
-!\[HTTP history](<images/06-history\_chat1\_bp\_Access control vulnerabilities\_IDOR.png>)
+![HTTP history](<images/06-history\_chat1\_bp\_Access control vulnerabilities\_IDOR.png>)
 
 
 
@@ -102,7 +102,7 @@ xhr.send(data);
 
 
 
-!\[Transcript JavaScript](<images/07-history\_chat2\_bp\_Access control vulnerabilities\_IDOR.png>)
+![Transcript JavaScript](<images/07-history\_chat2\_bp\_Access control vulnerabilities\_IDOR.png>)
 
 
 
@@ -178,7 +178,7 @@ This confirms that the chat transcript files are stored with predictable filenam
 
 
 
-!\[Download transcript](<images/05-Download\_transcript\_bp\_Access control vulnerabilities\_IDOR.png>)
+![Download transcript](<images/05-Download\_transcript\_bp\_Access control vulnerabilities\_IDOR.png>)
 
 
 
@@ -194,7 +194,7 @@ Inside the transcript, there is a password belonging to the user `carlos`.
 
 
 
-!\[Password found](<images/08-passwd\_found\_bp\_Access control vulnerabilities\_IDOR.png>)
+![Password found](<images/08-passwd\_found\_bp\_Access control vulnerabilities\_IDOR.png>)
 
 
 
@@ -226,7 +226,7 @@ and the password found in the transcript file to log in.
 
 
 
-!\[Return to login](<images/09-return\_login\_bp\_Access control vulnerabilities\_IDOR.png>)
+![Return to login](<images/09-return\_login\_bp\_Access control vulnerabilities\_IDOR.png>)
 
 
 
@@ -234,7 +234,7 @@ After logging in successfully, the lab is solved.
 
 
 
-!\[Login success](<images/10-Login-success\_bp\_Access control vulnerabilities\_IDOR.png>)
+![Login success](<images/10-Login-success\_bp\_Access control vulnerabilities\_IDOR.png>)
 
 
 
