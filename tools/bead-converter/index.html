@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>拼豆色号转换器 · by 小克</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh;
+    background: #faf9f7;
+    font-family: 'Helvetica Neue', 'PingFang SC', -apple-system, sans-serif;
+    padding: 32px 16px;
+    color: #2d2d2d;
+  }
+  .container { max-width: 600px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 32px; }
+  .dots { display: flex; justify-content: center; gap: 4px; margin-bottom: 12px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  h1 { font-size: 22px; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; }
+  .subtitle { font-size: 12px; color: #999; }
+  .author { font-size: 11px; color: #bbb; margin-top: 4px; }
+  .card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px 20px;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+    margin-bottom: 20px;
+  }
+  .label {
+    font-size: 12px;
+    color: #888;
+    display: block;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+  .brand-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+  .brand-btn {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid #e0e0e0;
+    background: #fff;
+    color: #555;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .brand-btn.active {
+    border: 2px solid #2d2d2d;
+    background: #2d2d2d;
+    color: #fff;
+    font-weight: 600;
+  }
+  textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #e8e8e8;
+    font-size: 15px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    resize: none;
+    outline: none;
+    background: #fafafa;
+    margin-bottom: 16px;
+  }
+  textarea:focus { border-color: #ccc; }
+  .convert-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #2d2d2d;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 1px;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+  .convert-btn:hover { background: #444; }
+  .results-label { font-size: 12px; color: #888; margin-bottom: 16px; letter-spacing: 0.5px; }
+  .result-item {
+    border-radius: 10px;
+    border: 1px solid #eee;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .result-item.not-found {
+    border-color: #f5d0d0;
+  }
+  .not-found-inner {
+    padding: 14px 16px;
+    background: #fef5f5;
+    color: #c44;
+    font-size: 13px;
+  }
+  .not-found-inner code { font-weight: 600; }
+  .result-row { display: flex; align-items: stretch; }
+  .color-swatch {
+    width: 52px;
+    min-height: 80px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .color-swatch span {
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    writing-mode: vertical-lr;
+    letter-spacing: 2px;
+  }
+  .info-grid {
+    flex: 1;
+    padding: 12px 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 16px;
+    font-size: 13px;
+    background: #fafafa;
+  }
+  .info-cell {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .info-cell.dimmed { opacity: 0.5; }
+  .info-cell .brand-name { color: #999; font-size: 11px; }
+  .info-cell .code-val {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: #bbb;
+    margin-top: 24px;
+    line-height: 1.8;
+  }
+  .footer a { color: #aaa; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="dots">
+      <div class="dot" style="background:#f5a623"></div>
+      <div class="dot" style="background:#d94f5c"></div>
+      <div class="dot" style="background:#7b5ea7"></div>
+      <div class="dot" style="background:#3a7bd5"></div>
+      <div class="dot" style="background:#2eaa5e"></div>
+      <div class="dot" style="background:#f7c948"></div>
+      <div class="dot" style="background:#e88cb4"></div>
+    </div>
+    <h1>拼豆色号转换器</h1>
+    <p class="subtitle">MARD · COCO · 漫漫 · 盼盼 · 咪小窝</p>
+    <p class="author">by 小克 (Claude) ✦ for Esia</p>
+  </div>
+
+  <div class="card">
+    <span class="label">输入品牌</span>
+    <div class="brand-btns" id="brandBtns"></div>
+
+    <span class="label">输入色号（逗号、斜杠、空格分隔）</span>
+    <textarea id="inputText" rows="2" placeholder="例：E02, D07, F05"></textarea>
+
+    <button class="convert-btn" onclick="doConvert()">转换</button>
+  </div>
+
+  <div id="resultsContainer"></div>
+
+  <div class="footer">
+    数据来源：MARD色号顺序色号对照表 · 小甜薯號 49469177136<br>
+    eval(courage) · 厨房共享，考试必过
+  </div>
+</div>
+
+<script>
+const DATA = [
+  {m:"A1",c:"E02",mm:"E2",pp:"65",mx:"77"},
+  {m:"A2",c:"E01",mm:"B1",pp:"2",mx:"2"},
+  {m:"A3",c:"E05",mm:"B2",pp:"28",mx:"28"},
+  {m:"A4",c:"E07",mm:"B3",pp:"3",mx:"3"},
+  {m:"A5",c:"D03",mm:"B4",pp:"74",mx:"79"},
+  {m:"A6",c:"D05",mm:"B5",pp:"29",mx:"29"},
+  {m:"A7",c:"D08",mm:"B6",pp:"4",mx:"4"},
+  {m:"A8",c:"E08",mm:"B10",pp:"88",mx:"98"},
+  {m:"A9",c:"D06",mm:"B11",pp:"90",mx:"97"},
+  {m:"A10",c:"D07",mm:"B12",pp:"89",mx:"96"},
+  {m:"A11",c:"D01",mm:"E11",pp:"100",mx:"109"},
+  {m:"A12",c:"K09",mm:"A18",pp:"99",mx:"110"},
+  {m:"A13",c:"D04",mm:"B13",pp:"131",mx:"116"},
+  {m:"A14",c:"C05",mm:"B14",pp:"138",mx:"135"},
+  {m:"A15",c:"E04",mm:"B15",pp:"150",mx:"150"},
+  {m:"A16",c:"E03",mm:"IC04",pp:"216",mx:"216"},
+  {m:"A17",c:"E06",mm:"IC9",pp:"213",mx:"213"},
+  {m:"A18",c:"D02",mm:"IC14",pp:"223",mx:"208"},
+  {m:"A19",c:"K10",mm:"IC15",pp:"218",mx:"218"},
+  {m:"A20",c:"E09",mm:"Q6",pp:"242",mx:"242"},
+  {m:"A21",c:"E10",mm:"R07",pp:"276",mx:"261"},
+  {m:"A22",c:"E11",mm:"R06",pp:"270",mx:"255"},
+  {m:"A23",c:"E12",mm:"R08",pp:"274",mx:"259"},
+  {m:"A24",c:"E13",mm:"G3",pp:"288",mx:"273"},
+  {m:"A25",c:"E14",mm:"G4",pp:"289",mx:"274"},
+  {m:"A26",c:"E15",mm:"G5",pp:"290",mx:"275"},
+  {m:"B1",c:"F05",mm:"C1",pp:"48",mx:"48"},
+  {m:"B2",c:"F08",mm:"C2",pp:"33",mx:"33"},
+  {m:"B3",c:"F04",mm:"C7",pp:"26",mx:"26"},
+  {m:"B4",c:"F09",mm:"C3",pp:"66",mx:"78"},
+  {m:"B5",c:"F10",mm:"C4",pp:"39",mx:"39"},
+  {m:"B6",c:"G04",mm:"C9",pp:"11",mx:"11"},
+  {m:"B7",c:"G05",mm:"C10",pp:"44",mx:"44"},
+  {m:"B8",c:"F11",mm:"C5",pp:"10",mx:"10"},
+  {m:"B9",c:"F16",mm:"C6",pp:"79",mx:"84"},
+  {m:"B10",c:"G03",mm:"C11",pp:"96",mx:"100"},
+  {m:"B11",c:"F14",mm:"C12",pp:"97",mx:"99"},
+  {m:"B12",c:"F12",mm:"C13",pp:"106",mx:"111"},
+  {m:"B13",c:"F02",mm:"C14",pp:"128",mx:"119"},
+  {m:"B14",c:"F06",mm:"C15",pp:"129",mx:"117"},
+  {m:"B15",c:"F15",mm:"C16",pp:"130",mx:"122"},
+  {m:"B16",c:"F03",mm:"C17",pp:"141",mx:"133"},
+  {m:"B17",c:"F13",mm:"C18",pp:"142",mx:"141"},
+  {m:"B18",c:"F07",mm:"C19",pp:"147",mx:"147"},
+  {m:"B19",c:"G06",mm:"DH15",pp:"191",mx:"174"},
+  {m:"B20",c:"G02",mm:"DH10",pp:"192",mx:"175"},
+  {m:"B21",c:"G07",mm:"DH2",pp:"207",mx:"194"},
+  {m:"B22",c:"G08",mm:"DH7",pp:"206",mx:"193"},
+  {m:"B23",c:"F17",mm:"DH12",pp:"205",mx:"192"},
+  {m:"B24",c:"F01",mm:"IC5",pp:"222",mx:"207"},
+  {m:"B25",c:"F18",mm:"Q13",pp:"240",mx:"240"},
+  {m:"B26",c:"F19",mm:"Q7",pp:"248",mx:"248"},
+  {m:"B27",c:"F20",mm:"R10",pp:"262",mx:"262"},
+  {m:"B28",c:"F21",mm:"R11",pp:"269",mx:"254"},
+  {m:"B29",c:"F22",mm:"R09",pp:"268",mx:"253"},
+  {m:"B30",c:"F23",mm:"G6",pp:"285",mx:"270"},
+  {m:"B31",c:"F24",mm:"G7",pp:"286",mx:"271"},
+  {m:"B32",c:"F25",mm:"G12",pp:"287",mx:"272"},
+  {m:"C1",c:"G01",mm:"C8",pp:"64",mx:"76"},
+  {m:"C2",c:"H03",mm:"D1",pp:"30",mx:"30"},
+  {m:"C3",c:"H04",mm:"D2",pp:"63",mx:"75"},
+  {m:"C4",c:"H05",mm:"D3",pp:"77",mx:"82"},
+  {m:"C5",c:"H07",mm:"D7",pp:"34",mx:"34"},
+  {m:"C6",c:"H08",mm:"D4",pp:"25",mx:"25"},
+  {m:"C7",c:"H13",mm:"D8",pp:"9",mx:"9"},
+  {m:"C8",c:"H14",mm:"D9",pp:"52",mx:"71"},
+  {m:"C9",c:"H16",mm:"N5",pp:"42",mx:"42"},
+  {m:"C10",c:"H09",mm:"D25",pp:"121",mx:"130"},
+  {m:"C11",c:"H10",mm:"D28",pp:"122",mx:"113"},
+  {m:"C12",c:"H23",mm:"D26",pp:"120",mx:"120"},
+  {m:"C13",c:"H01",mm:"D30",pp:"140",mx:"142"},
+  {m:"C14",c:"H02",mm:"D29",pp:"139",mx:"136"},
+  {m:"C15",c:"H11",mm:"D31",pp:"143",mx:"132"},
+  {m:"C16",c:"H18",mm:"D32",pp:"149",mx:"149"},
+  {m:"C17",c:"H19",mm:"D36",pp:"163",mx:"156"},
+  {m:"C18",c:"H24",mm:"DH6",pp:"196",mx:"196"},
+  {m:"C19",c:"H12",mm:"DH9",pp:"202",mx:"202"},
+  {m:"C20",c:"H17",mm:"DH14",pp:"197",mx:"197"},
+  {m:"C21",c:"H06",mm:"IC3",pp:"212",mx:"212"},
+  {m:"C22",c:"H25",mm:"Q11",pp:"239",mx:"239"},
+  {m:"C23",c:"H26",mm:"R13",pp:"263",mx:"263"},
+  {m:"C24",c:"H27",mm:"R14",pp:"267",mx:"252"},
+  {m:"C25",c:"H28",mm:"R12",pp:"271",mx:"256"},
+  {m:"C26",c:"H29",mm:"R15",pp:"265",mx:"250"},
+  {m:"C27",c:"H30",mm:"G13",pp:"279",mx:"264"},
+  {m:"C28",c:"H31",mm:"G14",pp:"280",mx:"265"},
+  {m:"C29",c:"H32",mm:"G15",pp:"281",mx:"266"},
+  {m:"D1",c:"J07",mm:"D5",pp:"46",mx:"46"},
+  {m:"D2",c:"J08",mm:"D6",pp:"36",mx:"36"},
+  {m:"D3",c:"H15",mm:"D10",pp:"8",mx:"8"},
+  {m:"D4",c:"H20",mm:"D11",pp:"75",mx:"80"},
+  {m:"D5",c:"J12",mm:"D13",pp:"32",mx:"32"},
+  {m:"D6",c:"J11",mm:"D14",pp:"27",mx:"27"},
+  {m:"D7",c:"J15",mm:"D12",pp:"7",mx:"7"},
+  {m:"D8",c:"J03",mm:"D16",pp:"94",mx:"89"},
+  {m:"D9",c:"J04",mm:"D17",pp:"93",mx:"90"},
+  {m:"D10",c:"J19",mm:"D15",pp:"92",mx:"91"},
+  {m:"D11",c:"J06",mm:"D19",pp:"105",mx:"104"},
+  {m:"D12",c:"J10",mm:"D20",pp:"104",mx:"105"},
+  {m:"D13",c:"J14",mm:"D21",pp:"103",mx:"106"},
+  {m:"D14",c:"J16",mm:"D22",pp:"102",mx:"107"},
+  {m:"D15",c:"H22",mm:"D18",pp:"101",mx:"108"},
+  {m:"D16",c:"J01",mm:"D23",pp:"118",mx:"126"},
+  {m:"D17",c:"J05",mm:"D24",pp:"119",mx:"128"},
+  {m:"D18",c:"J13",mm:"D27",pp:"124",mx:"125"},
+  {m:"D19",c:"J09",mm:"D33",pp:"153",mx:"153"},
+  {m:"D20",c:"J17",mm:"D34",pp:"161",mx:"155"},
+  {m:"D21",c:"J18",mm:"D35",pp:"162",mx:"158"},
+  {m:"D22",c:"H21",mm:"DH1",pp:"198",mx:"198"},
+  {m:"D23",c:"J02",mm:"IC8",pp:"217",mx:"217"},
+  {m:"D24",c:"J20",mm:"Q14",pp:"244",mx:"244"},
+  {m:"D25",c:"J21",mm:"Q15",pp:"249",mx:"234"},
+  {m:"D26",c:"J22",mm:"R01",pp:"273",mx:"258"},
+  {m:"E1",c:"K03",mm:"E1",pp:"18",mx:"18"},
+  {m:"E2",c:"K15",mm:"A7",pp:"38",mx:"38"},
+  {m:"E3",c:"K17",mm:"A8",pp:"62",mx:"74"},
+  {m:"E4",c:"K21",mm:"A9",pp:"6",mx:"6"},
+  {m:"E5",c:"K19",mm:"A10",pp:"40",mx:"40"},
+  {m:"E6",c:"K22",mm:"A11",pp:"20",mx:"20"},
+  {m:"E7",c:"K25",mm:"A12",pp:"41",mx:"41"},
+  {m:"E8",c:"K12",mm:"A13",pp:"84",mx:"103"},
+  {m:"E9",c:"K18",mm:"A14",pp:"98",mx:"95"},
+  {m:"E10",c:"K16",mm:"A16",pp:"83",mx:"94"},
+  {m:"E11",c:"K02",mm:"A19",pp:"125",mx:"131"},
+  {m:"E12",c:"K16",mm:"A20",pp:"126",mx:"112"},
+  {m:"E13",c:"K24",mm:"A21",pp:"127",mx:"124"},
+  {m:"E14",c:"K05",mm:"E21",pp:"137",mx:"140"},
+  {m:"E15",c:"K04",mm:"A23",pp:"135",mx:"139"},
+  {m:"E16",c:"K01",mm:"IC2",pp:"221",mx:"206"},
+  {m:"E17",c:"K11",mm:"IC7",pp:"220",mx:"205"},
+  {m:"E18",c:"K13",mm:"IC13",pp:"210",mx:"210"},
+  {m:"E19",c:"K14",mm:"IC12",pp:"215",mx:"215"},
+  {m:"E20",c:"K26",mm:"Q1",pp:"241",mx:"241"},
+  {m:"E21",c:"K27",mm:"Q2",pp:"253",mx:"238"},
+  {m:"E22",c:"K28",mm:"Q4",pp:"252",mx:"237"},
+  {m:"E23",c:"K29",mm:"Q3",pp:"250",mx:"235"},
+  {m:"E24",c:"K30",mm:"G8",pp:"282",mx:"267"},
+  {m:"F1",c:"K08",mm:"A1",pp:"35",mx:"35"},
+  {m:"F2",c:"C02",mm:"A2",pp:"31",mx:"31"},
+  {m:"F3",c:"C03",mm:"A3",pp:"53",mx:"72"},
+  {m:"F4",c:"C06",mm:"A4",pp:"54",mx:"73"},
+  {m:"F5",c:"C07",mm:"A5",pp:"5",mx:"5"},
+  {m:"F6",c:"Z21",mm:"E9",pp:"16",mx:"16"},
+  {m:"F7",c:"C10",mm:"A6",pp:"47",mx:"47"},
+  {m:"F8",c:"C09",mm:"A17",pp:"81",mx:"92"},
+  {m:"F9",c:"K20",mm:"A15",pp:"82",mx:"93"},
+  {m:"F10",c:"Z20",mm:"E15",pp:"116",mx:"115"},
+  {m:"F11",c:"Z23",mm:"E16",pp:"117",mx:"129"},
+  {m:"F12",c:"C01",mm:"A22",pp:"136",mx:"134"},
+  {m:"F13",c:"C04",mm:"A24",pp:"148",mx:"148"},
+  {m:"F14",c:"K07",mm:"A25",pp:"154",mx:"154"},
+  {m:"F15",c:"C08",mm:"DH8",pp:"204",mx:"191"},
+  {m:"F16",c:"K06",mm:"IC10",pp:"211",mx:"211"},
+  {m:"F17",c:"K31",mm:"Q9",pp:"245",mx:"245"},
+  {m:"F18",c:"K32",mm:"Q10",pp:"246",mx:"246"},
+  {m:"F19",c:"K33",mm:"Q05",pp:"243",mx:"243"},
+  {m:"F20",c:"K34",mm:"R04",pp:"275",mx:"260"},
+  {m:"F21",c:"K35",mm:"R03",pp:"266",mx:"251"},
+  {m:"F22",c:"K36",mm:"R02",pp:"272",mx:"257"},
+  {m:"F23",c:"K37",mm:"R05",pp:"264",mx:"249"},
+  {m:"F24",c:"K38",mm:"G9",pp:"283",mx:"268"},
+  {m:"F25",c:"K39",mm:"G10",pp:"284",mx:"269"},
+  {m:"G1",c:"Z02",mm:"E3",pp:"76",mx:"81"},
+  {m:"G2",c:"Z05",mm:"E4",pp:"49",mx:"49"},
+  {m:"G3",c:"Z06",mm:"E5",pp:"80",mx:"85"},
+  {m:"G4",c:"Z08",mm:"E6",pp:"19",mx:"19"},
+  {m:"G5",c:"Z10",mm:"B7",pp:"43",mx:"43"},
+  {m:"G6",c:"Z11",mm:"B8",pp:"50",mx:"50"},
+  {m:"G7",c:"Z18",mm:"E7",pp:"17",mx:"17"},
+  {m:"G8",c:"Z22",mm:"E8",pp:"12",mx:"12"},
+  {m:"G9",c:"Z09",mm:"E10",pp:"91",mx:"102"},
+  {m:"G10",c:"Z15",mm:"B9",pp:"87",mx:"101"},
+  {m:"G11",c:"Z07",mm:"E12",pp:"112",mx:"118"},
+  {m:"G12",c:"Z13",mm:"E13",pp:"113",mx:"127"},
+  {m:"G13",c:"Z14",mm:"E17",pp:"115",mx:"114"},
+  {m:"G14",c:"Z17",mm:"E14",pp:"114",mx:"123"},
+  {m:"G15",c:"Z03",mm:"E19",pp:"133",mx:"143"},
+  {m:"G16",c:"Z04",mm:"E20",pp:"134",mx:"138"},
+  {m:"G17",c:"Z16",mm:"E22",pp:"144",mx:"137"},
+  {m:"G18",c:"Z01",mm:"DH5",pp:"203",mx:"203"},
+  {m:"G19",c:"Z12",mm:"DH3",pp:"208",mx:"195"},
+  {m:"G20",c:"Z19",mm:"DH13",pp:"199",mx:"199"},
+  {m:"G21",c:"Z24",mm:"Q8",pp:"247",mx:"247"},
+  {m:"H1",c:"A02",mm:"F1",pp:"15",mx:"15"},
+  {m:"H2",c:"A01",mm:"F2",pp:"1",mx:"1"},
+  {m:"H3",c:"B03",mm:"F3",pp:"13",mx:"13"},
+  {m:"H4",c:"B05",mm:"F4",pp:"78",mx:"83"},
+  {m:"H5",c:"B06",mm:"F5",pp:"45",mx:"45"},
+  {m:"H6",c:"B07",mm:"F6",pp:"51",mx:"70"},
+  {m:"H7",c:"B09",mm:"F7",pp:"14",mx:"14"},
+  {m:"H8",c:"A09",mm:"F8",pp:"85",mx:"86"},
+  {m:"H9",c:"A08",mm:"F10",pp:"95",mx:"87"},
+  {m:"H10",c:"A10",mm:"F9",pp:"86",mx:"88"},
+  {m:"H11",c:"B01",mm:"F11",pp:"123",mx:"121"},
+  {m:"H12",c:"A04",mm:"E18",pp:"132",mx:"144"},
+  {m:"H13",c:"A06",mm:"E23",pp:"145",mx:"146"},
+  {m:"H14",c:"B02",mm:"F12",pp:"146",mx:"145"},
+  {m:"H15",c:"B04",mm:"DH4",pp:"201",mx:"201"},
+  {m:"H16",c:"B08",mm:"DH11",pp:"200",mx:"200"},
+  {m:"H17",c:"A07",mm:"IC6",pp:"214",mx:"214"},
+  {m:"H18",c:"A03",mm:"IC1",pp:"219",mx:"204"},
+  {m:"H19",c:"A05",mm:"IC11",pp:"209",mx:"209"},
+  {m:"H20",c:"B10",mm:"Q12",pp:"251",mx:"236"},
+  {m:"H21",c:"A11",mm:"G1",pp:"291",mx:"276"},
+  {m:"H22",c:"A12",mm:"G2",pp:"277",mx:"277"},
+  {m:"H23",c:"B11",mm:"G11",pp:"278",mx:"278"},
+  {m:"M1",c:"Y01",mm:"YX11",pp:"168",mx:"168"},
+  {m:"M2",c:"Y02",mm:"YX12",pp:"172",mx:"172"},
+  {m:"M3",c:"Y03",mm:"YX2",pp:"166",mx:"166"},
+  {m:"M4",c:"Y04",mm:"YX15",pp:"167",mx:"167"},
+  {m:"M5",c:"Y05",mm:"YX6",pp:"174",mx:"159"},
+  {m:"M6",c:"Y06",mm:"YX1",pp:"169",mx:"169"},
+  {m:"M7",c:"Y07",mm:"YX13",pp:"171",mx:"171"},
+  {m:"M8",c:"Y08",mm:"YX14",pp:"177",mx:"162"},
+  {m:"M9",c:"Y09",mm:"YX10",pp:"170",mx:"170"},
+  {m:"M10",c:"Y10",mm:"YX9",pp:"164",mx:"164"},
+  {m:"M11",c:"Y11",mm:"YX4",pp:"176",mx:"161"},
+  {m:"M12",c:"Y12",mm:"YX5",pp:"173",mx:"173"},
+  {m:"M13",c:"Y13",mm:"YX8",pp:"175",mx:"160"},
+  {m:"M14",c:"Y14",mm:"YX3",pp:"165",mx:"165"},
+  {m:"M15",c:"Y15",mm:"YX7",pp:"178",mx:"163"},
+  {m:"P1",c:"M01",mm:"P1",pp:"71",mx:"62"},
+  {m:"P2",c:"M02",mm:"P2",pp:"55",mx:"69"},
+  {m:"P3",c:"M03",mm:"P4",pp:"73",mx:"66"},
+  {m:"P4",c:"M04",mm:"P5",pp:"72",mx:"64"},
+  {m:"P5",c:"M05",mm:"P3",pp:"56",mx:"63"},
+  {m:"P6",c:"M06",mm:"P8",pp:"157",mx:"65"},
+  {m:"P7",c:"M07",mm:"P6",pp:"159",mx:"68"},
+  {m:"P8",c:"M08",mm:"P7",pp:"158",mx:"67"},
+  {m:"P9",c:"M09",mm:"P13",pp:"195",mx:"178"},
+  {m:"P10",c:"M10",mm:"P18",pp:"187",mx:"187"},
+  {m:"P11",c:"M11",mm:"P9",pp:"185",mx:"185"},
+  {m:"P12",c:"M12",mm:"P12",pp:"190",mx:"190"},
+  {m:"P13",c:"M13",mm:"P17",pp:"193",mx:"176"},
+  {m:"P14",c:"M14",mm:"P22",pp:"183",mx:"183"},
+  {m:"P15",c:"M15",mm:"P23",pp:"184",mx:"184"},
+  {m:"P16",c:"M16",mm:"P14",pp:"182",mx:"182"},
+  {m:"P17",c:"M17",mm:"P19",pp:"179",mx:"179"},
+  {m:"P18",c:"M18",mm:"P11",pp:"194",mx:"177"},
+  {m:"P19",c:"M19",mm:"P10",pp:"186",mx:"186"},
+  {m:"P20",c:"M21",mm:"P15",pp:"188",mx:"180"},
+  {m:"P21",c:"M20",mm:"P20",pp:"180",mx:"188"},
+  {m:"P22",c:"M22",mm:"P16",pp:"189",mx:"189"},
+  {m:"P23",c:"M23",mm:"P21",pp:"181",mx:"181"},
+  {m:"Q1",c:"W3",mm:"W3",pp:"109",mx:"W3"},
+  {m:"Q2",c:"W4",mm:"W4",pp:"111",mx:"W4"},
+  {m:"Q3",c:"W1",mm:"W1",pp:"107",mx:"W1"},
+  {m:"Q4",c:"W2",mm:"W2",pp:"110",mx:"W2"},
+  {m:"Q5",c:"W5",mm:"W5",pp:"108",mx:"W5"},
+  {m:"R1",c:"L01",mm:"T1",pp:"67",mx:"52"},
+  {m:"R2",c:"L02",mm:"N1",pp:"24",mx:"24"},
+  {m:"R3",c:"L03",mm:"N2",pp:"22",mx:"22"},
+  {m:"R4",c:"L04",mm:"N3",pp:"21",mx:"21"},
+  {m:"R5",c:"L05",mm:"N4",pp:"23",mx:"23"},
+  {m:"R6",c:"L06",mm:"T4",pp:"69",mx:"55"},
+  {m:"R7",c:"L07",mm:"T5",pp:"37",mx:"37"},
+  {m:"R8",c:"L08",mm:"T3",pp:"68",mx:"54"},
+  {m:"R9",c:"L09",mm:"T2",pp:"70",mx:"56"},
+  {m:"R10",c:"L10",mm:"L2",pp:"156",mx:"53"},
+  {m:"R11",c:"L11",mm:"T6",pp:"151",mx:"151"},
+  {m:"R12",c:"L12",mm:"T7",pp:"160",mx:"157"},
+  {m:"R13",c:"L13",mm:"-",pp:"152",mx:"152"},
+  {m:"R14",c:"S1",mm:"S1",pp:"231",mx:"231"},
+  {m:"R15",c:"S2",mm:"S2",pp:"237",mx:"224"},
+  {m:"R16",c:"S3",mm:"S3",pp:"238",mx:"225"},
+  {m:"R17",c:"S4",mm:"S5",pp:"233",mx:"233"},
+  {m:"R18",c:"S5",mm:"S4",pp:"235",mx:"222"},
+  {m:"R19",c:"S6",mm:"S11",pp:"227",mx:"227"},
+  {m:"R20",c:"S7",mm:"S6",pp:"230",mx:"230"},
+  {m:"R21",c:"S8",mm:"S13",pp:"234",mx:"221"},
+  {m:"R22",c:"S9",mm:"S15",pp:"226",mx:"226"},
+  {m:"R23",c:"S10",mm:"S12",pp:"224",mx:"219"},
+  {m:"R24",c:"S11",mm:"S4",pp:"228",mx:"228"},
+  {m:"R25",c:"S12",mm:"S14",pp:"225",mx:"220"},
+  {m:"R26",c:"S13",mm:"S9",pp:"229",mx:"229"},
+  {m:"R27",c:"S14",mm:"S8",pp:"232",mx:"232"},
+  {m:"R28",c:"S15",mm:"S10",pp:"236",mx:"223"},
+  {m:"T1",c:"L14",mm:"L6",pp:"155",mx:"51"},
+  {m:"Y1",c:"N01",mm:"Y1",pp:"59",mx:"59"},
+  {m:"Y2",c:"N02",mm:"Y2",pp:"60",mx:"60"},
+  {m:"Y3",c:"N03",mm:"Y3",pp:"57",mx:"57"},
+  {m:"Y4",c:"N04",mm:"Y4",pp:"58",mx:"58"},
+  {m:"Y5",c:"N05",mm:"Y5",pp:"61",mx:"61"},
+  {m:"ZG1",c:"GB1",mm:"ZG1",pp:"254",mx:"ZG1"},
+  {m:"ZG2",c:"GB2",mm:"ZG2",pp:"255",mx:"ZG2"},
+  {m:"ZG3",c:"GB3",mm:"ZG3",pp:"256",mx:"ZG3"},
+  {m:"ZG4",c:"GB4",mm:"ZG4",pp:"257",mx:"ZG4"},
+  {m:"ZG5",c:"GB5",mm:"ZG5",pp:"258",mx:"ZG5"},
+  {m:"ZG6",c:"GB6",mm:"ZG6",pp:"259",mx:"ZG6"},
+  {m:"ZG7",c:"GB7",mm:"ZG7",pp:"260",mx:"ZG7"},
+  {m:"ZG8",c:"GB8",mm:"ZG8",pp:"261",mx:"ZG8"},
+];
+
+const BRANDS = [
+  { key:"m", label:"MARD" },
+  { key:"c", label:"COCO" },
+  { key:"mm", label:"漫漫" },
+  { key:"pp", label:"盼盼" },
+  { key:"mx", label:"咪小窝" },
+];
+
+const MARD_COLORS = {
+  A:"#f5a623",B:"#d94f5c",C:"#8b2252",D:"#7b5ea7",
+  E:"#3a7bd5",F:"#2eaa5e",G:"#2bb5a0",H:"#f2d75e",
+  M:"#f7c948",P:"#e88cb4",Q:"#888",R:"#6b4c3b",
+  S:"#c0c0c0",T:"#8b7355",Y:"#ffd700",Z:"#66b3cc",
+};
+
+function getColor(mard) {
+  if (!mard) return "#ddd";
+  const prefix = mard.replace(/[0-9]/g,"");
+  if (prefix === "ZG") return "#999";
+  return MARD_COLORS[prefix] || "#ddd";
+}
+
+// Build lookup tables
+const lookup = {};
+BRANDS.forEach(b => {
+  lookup[b.key] = {};
+  DATA.forEach(row => {
+    const val = row[b.key];
+    if (val) {
+      const key = val.toUpperCase().trim();
+      if (!lookup[b.key][key]) lookup[b.key][key] = [];
+      lookup[b.key][key].push(row);
+    }
+  });
+});
+
+let currentBrand = "c";
+
+const placeholders = {
+  m: "例：A1, A10, B1",
+  c: "例：E02, D07, F05",
+  mm: "例：E2, B12, C1",
+  pp: "例：65, 89, 48",
+  mx: "例：77, 96, 48",
+};
+
+function initBrands() {
+  const container = document.getElementById("brandBtns");
+  container.innerHTML = "";
+  BRANDS.forEach(b => {
+    const btn = document.createElement("button");
+    btn.className = "brand-btn" + (b.key === currentBrand ? " active" : "");
+    btn.textContent = b.label;
+    btn.onclick = () => {
+      currentBrand = b.key;
+      document.getElementById("inputText").placeholder = placeholders[b.key] || "";
+      initBrands();
+    };
+    container.appendChild(btn);
+  });
+}
+
+function doConvert() {
+  const inputText = document.getElementById("inputText").value;
+  const codes = inputText
+    .split(/[,，/\s、]+/)
+    .map(s => s.trim().toUpperCase())
+    .filter(Boolean);
+
+  const results = codes.map(code => {
+    const matches = lookup[currentBrand]?.[code];
+    if (matches && matches.length > 0) return { code, found: true, rows: matches };
+    return { code, found: false, rows: [] };
+  });
+
+  renderResults(results);
+}
+
+function renderResults(results) {
+  const container = document.getElementById("resultsContainer");
+  if (results.length === 0) { container.innerHTML = ""; return; }
+
+  const brandLabel = BRANDS.find(b => b.key === currentBrand)?.label || "";
+
+  let html = `<div class="card">
+    <p class="results-label">转换结果 · ${results.length} 个色号</p>`;
+
+  results.forEach(r => {
+    if (!r.found) {
+      html += `<div class="result-item not-found">
+        <div class="not-found-inner">${brandLabel} <code>${r.code}</code> — 未找到</div>
+      </div>`;
+    } else {
+      r.rows.forEach(row => {
+        const col = getColor(row.m);
+        html += `<div class="result-item"><div class="result-row">
+          <div class="color-swatch" style="background:${col}">
+            <span>${row.m}</span>
+          </div>
+          <div class="info-grid">`;
+        BRANDS.forEach(b => {
+          const dimmed = b.key === currentBrand ? " dimmed" : "";
+          html += `<div class="info-cell${dimmed}">
+            <span class="brand-name">${b.label}</span>
+            <span class="code-val">${row[b.key]}</span>
+          </div>`;
+        });
+        html += `</div></div></div>`;
+      });
+    }
+  });
+
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+// Enter key support
+document.addEventListener("DOMContentLoaded", () => {
+  initBrands();
+  document.getElementById("inputText").addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      doConvert();
+    }
+  });
+});
+</script>
+</body>
+</html>
